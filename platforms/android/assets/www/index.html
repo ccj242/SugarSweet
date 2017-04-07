@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+
+    <script src="js/ng-cordova.min.js"></script>
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js">
+    </script>
+    <script src="js/services.js">
+    </script>
+  </head>
+  <style>
+
+  a {
+    color:black;
+    text-decoration: none;
+  }
+
+  div.spinner {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  height: 85px;
+  text-align: center;
+}
+.spinner svg {
+  width: 19% !important;
+  height: 85px !important;
+}
+
+.modal{
+  top: 0 ;
+  bottom: 0 ; 
+  left: 0 ;
+  right: 0 ;
+  width: 100% ;
+}
+
+.antialias{
+   -webkit-font-smoothing: antialiased;
+   text-shadow: rgba(0,0,0,.01) 0 0 1px;
+}
+
+  </style>
+  <body ng-app="starter" ng-controller="AppCtrl" class="platform-android platform-cordova platform-webview">
+
+<div class="bar bar-header bar-calm" style="height:32vmin">
+  <h1 class="title" style="font-size:16vmin;overflow:visible;padding-top:.5em"><b>Sugar</b><span style="font-weight:200 !important">Sweet</span>
+  <!--
+  <div style="padding-top:0vmin;font-size:3.2vmin">a <b>free</b> app to identify <b>sugar alcohols</b> and artificial <b>sweetners</b></div>
+  -->
+  </h1>
+
+</div>
+<div style="position:absolute;z-index:9;left:7vmin;top:24vmin;color:white;font-size:4.8vmin">
+  a <b>free</b> app for <b>sugar alcohols</b>
+
+</div>
+
+ <div ng-click="share()" style="position:absolute;z-index:10;right:10.5vmin;top:25.3vmin"><span style="font-size:10.5vmin;color:white" class="ion-share"></span></div>
+
+ <div ng-click="share()" style="position:absolute;z-index:9;right:7vmin;top:23vmin"><img style="width:16vmin" class="antialias" src="img/redcircle.png"></div>
+    <ion-pane>
+   
+      <ion-content has-bouncing="false">
+
+    <div ng-if="loading" class="spinner">
+        <ion-spinner icon="android" class="spinner-calm"></ion-spinner>
+      </div>
+
+      <div ng-if="noscan">
+     <div class="padding" style="text-align:center;padding-top:33vmin;color:black;font-size:4.5vmin;line-height:4vmin"><span class="ion-ios-barcode-outline royal" style="font-size:16vmin"></span><br><b>Scan</b> any <b>barcode</b> in your pantry or at your grocery store</div>
+      <div class="padding" style="text-align:center;padding-top:2vmin;color:black;font-size:4.5vmin;line-height:4vmin"><span class="ion-ios-checkmark-outline" style="font-size:14vmin;color:rgb(24,202,27)"></span><br>We find any <b>sugar alcohols</b> or <b>artificial sweetners</b> in the ingredients</div>
+      <div class="padding" ng-click="openModal()" style="text-align:center;padding-top:2vmin;color:black;font-size:4.5vmin;line-height:4vmin"><span class="ion-ios-heart-outline" style="font-size:14vmin;color:rgb(255,0,0)"></span><br><b>Share us</b> on social media and download one of our other <b>non-profit</b>, free apps! </div>
+     
+      <div style="text-align:center;padding-top:6vmin">
+      <button class="button button-calm button-large" style="width:60vmin;height:13vmin;font-size:7vmin" ng-click="scan()"><b>Scan</b> Now</button>
+      </div>
+      <div class="padding" style="text-align:center;padding-top:2vmin;font-size:3vmin">
+      ©2016 Christopher Cinq-Mars Jarvis
+      </div>
+</div>
+<div ng-if="!noscan"> <!-- RESULTS -->
+
+<div ng-if="matches"> <!--Matches Found-->
+<div class="padding" style="text-align:center;padding-top:34vmin;color:black;font-size:5vmin;line-height:5vmin"><span class="ion-alert-circled" style="font-size:14vmin;color:rgb(255,199,18)"></span><br>
+Matches Found:
+</div>
+<div ng-repeat="sugar in sugars" ng-repeat="type in types" class="padding" style="text-align:center;padding-top:5vmin;color:black;font-size:7.5vmin;line-height:6vmin"><span ng-click="openfunc($index)"><b class="ion-ios-information-outline"> {{sugar[0]}}</b><br><i>{{sugar[1]}}</i></span>
+</div>
+</div>
+
+<div ng-if="safe"> <!--All Good-->
+<div class="padding" style="text-align:center;padding-top:40vmin;color:black;font-size:5vmin;line-height:7vmin;padding-bottom:5vmin"><span class="ion-thumbsup" style="font-size:14vmin;color:rgb(24,202,27)"></span><br>
+<b>Looking good!</b> No sugar alcohols or sweetners found.
+</div>
+</div>
+
+<div ng-if="upcerror"> <!--Invalid UPC-->
+<div class="padding" style="text-align:center;padding-top:40vmin;color:black;font-size:5vmin;line-height:7vmin;padding-bottom:0vmin"><span class="ion-ios-barcode-outline" style="font-size:14vmin"></span><br>
+Scan is <b>not</b> from a UPC or is incomplete
+</div>
+</div>
+
+<div ng-if="dataerror"> <!--Not In Database-->
+<div class="padding" style="text-align:center;padding-top:40vmin;color:black;font-size:5vmin;line-height:7vmin;padding-bottom:0vmin"><a href="http://developer.factual.com/contribute-or-correct-data/"><span class="ion-ios-cloud-download" style="font-size:14vmin"></span><br>
+<b>Product not found</b><br>SugarSweet uses the Factual Data API. You can add this product or suggest corrections to the database <b>here</b>. 
+</div></a>
+</div>
+
+<div ng-if="!loading">
+<div style="text-align:center;padding-top:8vmin">
+      <button class="button button-calm button-large" style="width:60vmin;height:13vmin;font-size:7vmin" ng-click="scan()"><b>Scan</b> Another</button>
+      </div>
+      <div class="padding" style="text-align:center;padding-top:2vmin;font-size:3vmin">
+      ©2016 Christopher Cinq-Mars Jarvis
+      </div>
+</div>
+</div>
+      </ion-content>
+    </ion-pane>
+
+     <script id="phoneflare.html" type="text/ng-template">
+
+      <div class="modal">
+        <header class="bar bar-header bar-calm">
+          <h1 class="title" style="font-size:24px"><b>Non-Profit</b> Projects</h1>
+          <div class="button button-clear" ng-click="modal.hide()"><span class="icon ion-close"></span></div>
+        </header>
+        <ion-content has-header="true" padding="true">
+
+
+<div class="padding" ng-click="phoneflare()" style="padding-top:80px">
+<img style="width:25%" src='img/PF_Rounded_Icon.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">Phone<strong>Flare</strong>   </b>
+<div style="padding-top:.5vh">
+A free, volunteer run <b>safety</b> iniative for communities and campuses
+</div>
+</div>
+ </div>
+
+<div class="padding" ng-click="synonymy()">
+<img style="width:25%" src='img/256.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">Synonymy   </b>
+<div style="padding-top:.5vh">
+An educational word game narrated by <b>Richard Dawkins</b>
+</div>
+</div>
+ </div>
+
+ <div class="padding" ng-click="birds()">
+<img style="width:25%" ng-src='img/birds.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">The Birds Upstairs </b>
+<div style="padding-top:.5vh">
+Student Academy Award nominated animated <b>short film</b>
+</div>
+</div>
+ </div>
+
+ <div class="padding" ng-show="SMSTactics" ng-click="smstactics()">
+<img style="width:25%" ng-src='img/SMS_Tactics2.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">SMS Tactics </b>
+<div style="padding-top:.5vh">
+An <b>experimental</b> texting game about manipulation and trust.
+</div>
+</div>
+ </div>
+
+ <div class="padding" ng-click="wordunk()">
+<img style="width:25%" ng-src='img/wordunknown.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">Word Unknown   </b>
+<div style="padding-top:.5vh">
+An elegant and addictive mix of hangman and mastermind. 
+</div>
+</div>
+ </div>
+
+ <div class="padding" ng-click="iconic()">
+<img style="width:25%" ng-src='img/Iconic.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">Iconic Passwords  </b>
+<div style="padding-top:.5vh">
+An innovative <b>password</b> management system.
+</div>
+</div>
+ </div>
+
+   <div class="padding" ng-click="tmm()">
+<img style="width:25%" ng-src='img/example.png'>
+<div style="width:70%;float:right;padding-top:2vh;font-size:4vmin;line-height:5vmin">
+<b style="font-size:5.5vmin">TypeMyMusic   </b>
+<div style="padding-top:.5vh">
+A free and easy to use music notation <b>font</b>. 
+</div>
+</div>
+ </div>
+
+        <!--
+          <img src="img/logo.png" style="display:block;width:180%;margin:auto">
+-->
+        </ion-content>
+      </div>
+    </script>
+
+
+  </body>
+</html>
